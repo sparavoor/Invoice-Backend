@@ -11,20 +11,10 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 3. CORS കോൺഫിഗറേഷൻ (App ഉണ്ടാക്കിയ ശേഷമേ ഇത് നൽകാവൂ)
 app.use(cors({
-  origin: [
-    'https://asset.samasthagraph.com',
-    'https://samasthagraph.com',
-    'https://app.samasthagraph.com',
-    'https://admin.samasthagraph.com',
-    'https://api.samasthagraph.com',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:5000'
-  ],
-  credentials: true
+  origin: '*', // Allows Vercel frontend and all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // 4. Middlewares
