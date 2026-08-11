@@ -5,13 +5,21 @@ let pool = null;
 let connectionError = null;
 
 async function initDb() {
-  const host = process.env.DB_HOST || 'localhost';
-  const port = parseInt(process.env.DB_PORT || '3307', 10);
-  const user = process.env.DB_USER || 'root';
-  const password = process.env.DB_PASSWORD || '9695';
-  const database = process.env.DB_NAME || 'graphassets';
+  const host = process.env.DB_HOST;
+  const port = parseInt(process.env.DB_PORT || '3306', 10);
+  const user = process.env.DB_USER;
+  const password = process.env.DB_PASSWORD;
+  const database = process.env.DB_NAME;
 
-  const connectionConfig = { host, port, user, password };
+  const connectionConfig = {
+    host,
+    port,
+    user,
+    password,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  };
 
   try {
     // 1. Try to create connection without database to ensure it exists
@@ -28,9 +36,12 @@ async function initDb() {
       queueLimit: 0
     });
 
+    // Verify the connection pool is working
+    const connection = await pool.getConnection();
     console.log(`\x1b[32m[MySQL Success] Connected to database: ${database} on port ${port}\x1b[0m`);
+    connection.release();
 
-    // 3. Run auto-migrations / table creation
+    // Run auto-migrations / table creation
     await runMigrations();
     connectionError = null;
   } catch (error) {
@@ -41,9 +52,9 @@ Could not connect to MySQL database.
 Details: ${error.message}
 
 Please check that:
-1. XAMPP MySQL is active and running.
-2. The port (currently ${port}) matches your MySQL port.
-3. The username (currently ${user}) and password are correct.
+1. Your Aiven MySQL service is active and running.
+2. The port (currently ${port}) and host match your database credentials.
+3. The username, password, and database name are correct.
 
 You can modify these configurations in your .env file:
 c:\\Users\\User\\Desktop\\Graph.CLT\\Web\\Invoice\\.env
