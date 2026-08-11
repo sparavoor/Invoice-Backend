@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph.CLT - Invoice & Client Manager</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 28, 45, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #4f46e5;
+      --primary-glow: rgba(79, 70, 229, 0.35);
+      --primary-hover: #6366f1;
+      --accent: #f59e0b;
+      --accent-hover: #fbbf24;
+      --success: #10b981;
+      --danger: #ef4444;
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: var(--font-body);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.8);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-family: var(--font-heading);
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .logo-text {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #d1d5db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tab-link {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tab-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-link.active {
+      color: white;
+      background: var(--primary);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    main {
+      flex: 1;
+      padding: 2.5rem 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 992px) {
+      .grid-2col {
+        grid-template-columns: 1fr 2fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 576px) {
+      .form-group-row-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-group-row-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(11, 15, 25, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+      background: rgba(11, 15, 25, 0.8);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 8px;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #0b0f19;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    /* Table styles */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(11, 15, 25, 0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(22, 28, 45, 0.9);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .no-data {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 3rem 1.25rem;
+      font-style: italic;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.25px;
+    }
+
+    .badge-primary {
+      background: rgba(79, 70, 229, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(79, 70, 229, 0.3);
+    }
+
+    .badge-accent {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-status-paid {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-status-sent {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-status-unpaid {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-status-draft {
+      background: rgba(156, 163, 175, 0.15);
+      color: #d1d5db;
+      border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+
+    .badge-status-accepted {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    /* Invoice Dynamic Items Row styles */
+    .invoice-items-header {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1.25fr 1fr 1fr 1.25fr 80px;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      padding: 0 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1.25fr 1fr 1fr 1.25fr 80px;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .row-total {
+      text-align: right;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      padding-right: 0.5rem;
+    }
+
+    .invoice-summary-box {
+      margin-top: 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .summary-line-grand {
+      font-size: 1.2rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--accent);
+      border-top: 1px solid var(--card-border);
+      padding-top: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(11, 15, 25, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-mark">G</div>
+      <div class="logo-text">Graph.CLT Database Portal</div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-link active" onclick="toggleTab('clients')">Clients</button>
+      <button class="tab-link" onclick="toggleTab('invoices')">Invoices</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- CLIENTS TAB SECTION -->
+    <section id="clientsSection" class="tab-content active">
+      <div class="grid grid-2col">
+        <!-- Add Client Form Card -->
+        <div class="card">
+          <h2>Add Client Form</h2>
+          <div class="form-group">
+            <label for="name">Client Name *</label>
+            <input type="text" id="name" class="form-control" placeholder="e.g. John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="company">Company Name</label>
+            <input type="text" id="company" class="form-control" placeholder="e.g. Acme Corp">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" class="form-control" placeholder="e.g. john@acme.com">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" class="form-control" placeholder="e.g. +1 (555) 019-2834">
+          </div>
+          <div class="form-group">
+            <label for="address">Postal/Billing Address</label>
+            <textarea id="address" class="form-control" placeholder="e.g. 123 Business St, Room 101"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveClient()" style="width: 100%; margin-top: 1rem;">
+            Save Client
+          </button>
+        </div>
+
+        <!-- Clients List Table -->
+        <div>
+          <h2>Clients Registry</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Company</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th style="width: 100px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clientsTableBody">
+                <tr>
+                  <td colspan="6" class="no-data">Loading clients database...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICES TAB SECTION -->
+    <section id="invoicesSection" class="tab-content">
+      <div class="grid grid-2col">
+        <!-- Add Invoice Form Card -->
+        <div class="card">
+          <h2>Create Invoice Form</h2>
+          
+          <div class="form-group">
+            <label for="invoiceClientSelect">Select Client *</label>
+            <select id="invoiceClientSelect" class="form-control" required>
+              <option value="">-- Loading Clients --</option>
+            </select>
+          </div>
+
+          <div class="form-group-row form-group-row-2">
+            <div class="form-group">
+              <label for="invoiceType">Document Type</label>
+              <select id="invoiceType" class="form-control">
+                <option value="invoice">Invoice</option>
+                <option value="quotation">Quotation</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="invoiceNumber">Document Number *</label>
+              <input type="text" id="invoiceNumber" class="form-control" placeholder="e.g. INV-2026-001" required>
+            </div>
+          </div>
+
+          <div class="form-group-row form-group-row-2">
+            <div class="form-group">
+              <label for="invoiceIssueDate">Issue Date</label>
+              <input type="date" id="invoiceIssueDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="invoiceDueDate">Due Date</label>
+              <input type="date" id="invoiceDueDate" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group-row form-group-row-2">
+            <div class="form-group">
+              <label for="invoiceStatus">Status</label>
+              <select id="invoiceStatus" class="form-control">
+                <option value="draft">Draft</option>
+                <option value="sent">Sent</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="accepted">Accepted</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="invoiceAdvance">Advance Paid</label>
+              <input type="number" id="invoiceAdvance" class="form-control" value="0.00" min="0" step="any" oninput="calculateGrandTotal()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="invoiceDescription">Project Description</label>
+            <input type="text" id="invoiceDescription" class="form-control" placeholder="e.g. Web Development & SEO Optimization">
+          </div>
+
+          <div class="form-group">
+            <label for="invoiceNotes">Internal Notes & Terms</label>
+            <textarea id="invoiceNotes" class="form-control" placeholder="e.g. Bank transfer info, payment terms..."></textarea>
+          </div>
+
+          <!-- Dynamic Line Items Container -->
+          <div style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-family: var(--font-heading); font-size: 1.1rem;">Line Items</h3>
+              <button class="btn btn-accent btn-sm" onclick="addInvoiceItemRow()">+ Add Row</button>
+            </div>
+            
+            <div class="invoice-items-header">
+              <div>Description</div>
+              <div>Qty</div>
+              <div>Rate</div>
+              <div>Tax%</div>
+              <div>Disc%</div>
+              <div style="text-align: right;">Total</div>
+              <div></div>
+            </div>
+
+            <div id="invoiceItemsContainer">
+              <!-- Item rows appended here dynamically -->
+            </div>
+          </div>
+
+          <!-- Total Summary Display Box -->
+          <div class="invoice-summary-box">
+            <div class="summary-line">
+              <span>Subtotal:</span>
+              <span>$<span id="summarySubtotal">0.00</span></span>
+            </div>
+            <div class="summary-line">
+              <span>Discount Total:</span>
+              <span>-$<span id="summaryDiscount">0.00</span></span>
+            </div>
+            <div class="summary-line">
+              <span>Tax Total:</span>
+              <span>+$<span id="summaryTax">0.00</span></span>
+            </div>
+            <div class="summary-line summary-line-grand">
+              <span>Grand Total:</span>
+              <span>$<span id="summaryGrand">0.00</span></span>
+            </div>
+            <div class="summary-line" style="margin-top: 0.5rem; font-weight: 600;">
+              <span>Balance Due:</span>
+              <span>$<span id="summaryBalance">0.00</span></span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="saveInvoice()" style="width: 100%; margin-top: 1.5rem;">
+            Save Document
+          </button>
+        </div>
+
+        <!-- Invoices Registry -->
+        <div>
+          <h2>Documents Registry</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Doc Number</th>
+                  <th>Type</th>
+                  <th>Client</th>
+                  <th>Issue Date</th>
+                  <th>Grand Total</th>
+                  <th>Advance</th>
+                  <th>Status</th>
+                  <th style="width: 100px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="invoicesTableBody">
+                <tr>
+                  <td colspan="8" class="no-data">Loading documents database...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Graph.CLT Database Manager © 2026. Custom MySQL & Express REST API Integration.
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script src="client.js"></script>
+</body>
+</html>
